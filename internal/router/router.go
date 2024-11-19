@@ -4,6 +4,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
 	"wind-surf-go/internal/handler"
+	"wind-surf-go/internal/middleware"
 )
 
 // SetupRouter initializes all routes and returns the router engine
@@ -23,13 +24,17 @@ func SetupRouter(db *gorm.DB) *gin.Engine {
 	{
 		api := v1.Group("/api")
 		{
-			// User routes
+			// Public user routes
 			users := api.Group("/users")
 			{
 				users.POST("/register", userHandler.Register)
 				users.POST("/login", userHandler.Login)
-				// Add more user-related routes here
-				// users.GET("/profile", userHandler.GetProfile)
+			}
+
+			// Protected user routes
+			authUsers := api.Group("/users", middleware.AuthMiddleware())
+			{
+				authUsers.GET("", userHandler.QueryUsers)
 			}
 
 			// Add more API groups here as needed

@@ -8,8 +8,11 @@ import (
 
 // Response codes
 const (
-	CodeSuccess = 0
-	CodeError   = 1
+	CodeSuccess          = 0
+	CodeError           = 1
+	CodeInvalidParams   = 2
+	CodeUnauthorized    = 3
+	CodeServerError     = 500
 )
 
 // Response is the standard API response structure
@@ -39,8 +42,16 @@ func CreatedResponse(c *gin.Context, data interface{}) {
 
 // ErrorResponse returns an error response
 func ErrorResponse(c *gin.Context, message string) {
-	c.JSON(http.StatusOK, Response{
+	c.JSON(http.StatusBadRequest, Response{
 		Code:    CodeError,
+		Message: message,
+	})
+}
+
+// UnauthorizedResponse returns an unauthorized response
+func UnauthorizedResponse(c *gin.Context, message string) {
+	c.JSON(http.StatusUnauthorized, Response{
+		Code:    CodeUnauthorized,
 		Message: message,
 	})
 }
@@ -48,7 +59,7 @@ func ErrorResponse(c *gin.Context, message string) {
 // ServerErrorResponse returns a server error response
 func ServerErrorResponse(c *gin.Context, message string) {
 	c.JSON(http.StatusInternalServerError, Response{
-		Code:    CodeError,
+		Code:    CodeServerError,
 		Message: message,
 	})
 }

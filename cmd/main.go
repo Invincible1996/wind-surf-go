@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"log"
 	"net/http"
 	"os"
@@ -10,7 +11,7 @@ import (
 	"time"
 
 	"github.com/spf13/viper"
-	"gorm.io/driver/sqlite"
+	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 	"wind-surf-go/internal/model"
 	"wind-surf-go/internal/router"
@@ -34,15 +35,26 @@ func main() {
 	}
 
 	// Initialize database
-	db, err := gorm.Open(sqlite.Open("wind-surf.db"), &gorm.Config{})
+	dsn := fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?charset=%s&parseTime=%v&loc=%s",
+		viper.GetString("mysql.username"),
+		viper.GetString("mysql.password"),
+		viper.GetString("mysql.host"),
+		viper.GetInt("mysql.port"),
+		viper.GetString("mysql.database"),
+		viper.GetString("mysql.charset"),
+		viper.GetBool("mysql.parseTime"),
+		viper.GetString("mysql.loc"),
+	)
+
+	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
 	if err != nil {
-		panic("failed to connect database")
+		panic("failed to connect database: " + err.Error())
 	}
 
 	// Auto migrate the schema
 	err = db.AutoMigrate(&model.User{})
 	if err != nil {
-		panic("failed to migrate database")
+		panic("failed to migrate database: " + err.Error())
 	}
 
 	// Setup router
@@ -73,7 +85,7 @@ func main() {
 
 	// 优雅关闭服务器
 	if err := srv.Shutdown(ctx); err != nil {
-		log.Fatal("Server forced to shutdown:", err)
+		log.Fatal("Server forced to shutdown: ", err)
 	}
 
 	log.Println("Server exiting")

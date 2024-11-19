@@ -13,7 +13,7 @@ A modern Go web application featuring user authentication and RESTful API design
   - Standardized response format
   - Clean project structure
 - Database Integration
-  - SQLite database
+  - MySQL database
   - GORM ORM integration
   - Automatic schema migration
 
@@ -113,12 +113,24 @@ git clone https://github.com/yourusername/wind-surf-go.git
 cd wind-surf-go
 ```
 
-2. Install dependencies
+2. Set up MySQL database
+```bash
+mysql -u root -p
+```
+
+```sql
+CREATE DATABASE wind_surf CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+```
+
+3. Configure the application
+Update the MySQL configuration in `internal/config/config.yaml` with your database credentials.
+
+4. Install dependencies
 ```bash
 go mod tidy
 ```
 
-3. Run the application
+5. Run the application
 ```bash
 go run cmd/main.go
 ```
@@ -126,7 +138,7 @@ go run cmd/main.go
 ## Dependencies
 
 - [Gin](https://github.com/gin-gonic/gin) - Web framework
-- [GORM](https://gorm.io) - ORM library
+- [GORM](https://gorm.io) - ORM library with MySQL driver
 - [JWT-Go](https://github.com/golang-jwt/jwt) - JWT implementation
 - [Viper](https://github.com/spf13/viper) - Configuration management
 
@@ -137,6 +149,16 @@ The application uses a YAML configuration file located at `internal/config/confi
 ```yaml
 server:
   port: "8080"  # Server port
+
+mysql:
+  host: "localhost"      # MySQL host
+  port: 3306            # MySQL port
+  username: "root"      # MySQL username
+  password: "123456"    # MySQL password
+  database: "wind_surf" # Database name
+  charset: "utf8mb4"    # Character set
+  parseTime: true       # Parse time values
+  loc: "Local"         # Time zone
 ```
 
 ## Security Considerations
